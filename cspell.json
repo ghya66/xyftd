@@ -1,0 +1,28 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "words": [
+    "userinfobot",
+    "tddb",
+    "Wkds",
+    "HLUP",
+    "UDPU",
+    "zhuan",
+    "zixun",
+    "gong",
+    "jiufen",
+    "guanggao",
+    "huiyuan",
+    "ziyuan",
+    "tousu",
+    "yanqun",
+    "xiaoqhf",
+    "xiaoq"
+  ],
+  "ignorePaths": [
+    "venv/**",
+    "*.lock",
+    "node_modules/**"
+  ]
+}
+
