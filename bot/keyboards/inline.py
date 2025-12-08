@@ -22,6 +22,25 @@ def get_entry_keyboard() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(keyboard)
 
 
+def get_job_selection_keyboard() -> InlineKeyboardMarkup:
+    """
+    获取岗位选择键盘
+    用户点击"了解入职流程"后显示的岗位选择按钮
+    """
+    buttons = TextManager.get_dict("buttons")
+    keyboard = [[
+        InlineKeyboardButton(
+            buttons.get("job_gongqun", "公群广告删除员"),
+            callback_data="job:gongqun"
+        ),
+        InlineKeyboardButton(
+            buttons.get("job_zhuanqun", "专群信息删除员"),
+            callback_data="job:zhuanqun"
+        ),
+    ]]
+    return InlineKeyboardMarkup(keyboard)
+
+
 def get_main_menu_keyboard() -> InlineKeyboardMarkup:
     """
     获取主菜单键盘 (10个按钮，2列x5行布局)

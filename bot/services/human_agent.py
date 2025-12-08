@@ -3,11 +3,24 @@
 用于在需要人工介入时通知管理员
 """
 
+import re
 from typing import List, Optional
 from telegram import Update
 from telegram.ext import ContextTypes
 
 from ..config import config
+
+
+def escape_markdown(text: str) -> str:
+    """
+    转义 Markdown 特殊字符
+    防止用户输入的文本破坏 Markdown 格式
+    """
+    if not text:
+        return text
+    # Markdown 特殊字符列表
+    escape_chars = r'_*[]()~`>#+-=|{}.!'
+    return re.sub(f'([{re.escape(escape_chars)}])', r'\\\1', text)
 
 
 class HumanAgentService:
@@ -65,27 +78,39 @@ class HumanAgentService:
             return False
         
         # 构建通知消息
-        photo_tag = "📷 [含图片]" if has_photo else ""
-        user_link = f"@{username}" if username else f"用户ID: {user_id}"
-        
+        photo_tag = "📷 \\[含图片\\]" if has_photo else ""
+
+        # 转义用户输入的文本，防止 Markdown 解析错误
+        safe_first_name = escape_markdown(first_name)
+        safe_username = escape_markdown(username) if username else ""
+        safe_message = escape_markdown(message) if message else ""
+        safe_service_type = escape_markdown(service_type)
+
+        # 始终显示用户 ID，方便管理员使用 /reply 命令
+        if safe_username:
+            user_info = f"@{safe_username}, ID: `{user_id}`"
+        else:
+            user_info = f"ID: `{user_id}`"
+
         notification = f"""🔔 新客服请求
 
-👤 用户: {first_name} ({user_link})
-📋 服务类型: {service_type}
+👤 用户: {safe_first_name} \\({user_info}\\)
+📋 服务类型: {safe_service_type}
 {photo_tag}
 
 💬 消息内容:
-{message if message else "[无文字消息]"}
+{safe_message if safe_message else "\\[无文字消息\\]"}
 
 ---
-点击用户链接可直接回复"""
-        
+💡 回复命令: `/reply {user_id} 您的回复内容`"""
+
         success_count = 0
         for admin_id in admin_ids:
             try:
                 await context.bot.send_message(
                     chat_id=admin_id,
                     text=notification,
+                    parse_mode="Markdown",
                 )
                 success_count += 1
             except Exception as e:

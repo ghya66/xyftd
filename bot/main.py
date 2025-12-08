@@ -26,6 +26,7 @@ from .handlers import (
     photo_handler,
     reload_command,
     config_command,
+    reply_command,
 )
 
 
@@ -40,6 +41,7 @@ BOT_COMMANDS_ADMIN = [
     BotCommand("start", "开始使用机器人"),
     BotCommand("reload", "重新加载配置"),
     BotCommand("config", "查看当前配置"),
+    BotCommand("reply", "回复用户消息"),
 ]
 
 
@@ -205,6 +207,7 @@ def main() -> None:
     # 2. 管理员命令
     application.add_handler(CommandHandler("reload", reload_command))
     application.add_handler(CommandHandler("config", config_command))
+    application.add_handler(CommandHandler("reply", reply_command))
 
     # 3. Callback Query (按钮点击)
     application.add_handler(CallbackQueryHandler(button_callback))

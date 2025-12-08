@@ -6,7 +6,7 @@ from .start import start_command
 from .callbacks import button_callback
 from .messages import message_handler
 from .photos import photo_handler
-from .admin import reload_command, config_command
+from .admin import reload_command, config_command, reply_command
 
 __all__ = [
     "start_command",
@@ -15,5 +15,6 @@ __all__ = [
     "photo_handler",
     "reload_command",
     "config_command",
+    "reply_command",
 ]
 

@@ -15,6 +15,7 @@ from ..keyboards.inline import (
     get_back_keyboard,
     get_payment_keyboard,
     get_service_name,
+    get_job_selection_keyboard,
 )
 from ..keyboards.reply import get_main_menu_reply_keyboard
 from ..services.text_manager import TextManager
@@ -87,6 +88,8 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         await handle_copy(query, param)
     elif action == "contact":
         await handle_contact(query, param, context)
+    elif action == "job":
+        await handle_job(query, param)
 
 
 async def handle_menu(query, param: str) -> None:
@@ -104,6 +107,41 @@ async def handle_menu(query, param: str) -> None:
             text=welcome_text,
             reply_markup=get_main_menu_reply_keyboard(),
         )
+
+        # 发送入职流程介绍 + 岗位选择按钮
+        job_intro = TextManager.get("job_intro", "")
+        if job_intro:
+            await query.message.reply_text(
+                text=job_intro,
+                reply_markup=get_job_selection_keyboard(),
+            )
+
+
+async def handle_job(query, param: str) -> None:
+    """处理岗位选择按钮"""
+    user = query.from_user
+
+    # 从配置中获取岗位详情
+    jobs = TextManager.get_dict("jobs")
+    job_data = jobs.get(param)
+
+    if not job_data:
+        await query.message.reply_text("岗位信息暂不可用，请联系客服。")
+        return
+
+    job_text = job_data.get("text", "")
+    job_title = job_data.get("title", "未知岗位")
+
+    # 替换占位符（收款地址等）
+    job_text = job_text.replace("{PAYMENT_ADDRESS}", config.PAYMENT_ADDRESS)
+
+    print(f"[Job] 用户 {user.first_name} (ID: {user.id}) 查看岗位: {job_title}")
+
+    # 发送岗位详情 + 返回主菜单按钮
+    await query.message.reply_text(
+        text=job_text,
+        reply_markup=get_back_keyboard(),
+    )
 
 
 async def handle_service(query, param: str, context: ContextTypes.DEFAULT_TYPE) -> None:
