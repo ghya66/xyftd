@@ -1,0 +1,23 @@
+# 土豆担保机器人 - Python 依赖
+
+# Telegram Bot 框架 (异步版本)
+python-telegram-bot>=20.0
+
+# 环境变量管理
+python-dotenv>=1.0.0
+
+# 数据库 ORM (可选)
+# sqlalchemy>=2.0.0
+# asyncpg>=0.28.0  # PostgreSQL 异步驱动
+# aiosqlite>=0.19.0  # SQLite 异步驱动
+
+# Redis 缓存 (可选)
+# redis>=4.5.0
+
+# 测试框架
+pytest>=7.0.0
+pytest-asyncio>=0.21.0
+
+# 日志格式化
+colorlog>=6.7.0
+

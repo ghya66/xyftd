@@ -1,0 +1,99 @@
+# ============================================
+# 土豆担保机器人 - Systemd 服务配置
+# ============================================
+# 
+# 安装步骤:
+# 1. 复制此文件到 /etc/systemd/system/
+#    sudo cp tdbot.service /etc/systemd/system/
+#
+# 2. 重新加载 systemd 配置
+#    sudo systemctl daemon-reload
+#
+# 3. 启动服务
+#    sudo systemctl start tdbot
+#
+# 4. 设置开机自启
+#    sudo systemctl enable tdbot
+#
+# 5. 查看服务状态
+#    sudo systemctl status tdbot
+#
+# 6. 查看日志
+#    sudo journalctl -u tdbot -f
+#
+# ============================================
+
+[Unit]
+Description=土豆担保 Telegram Bot
+Documentation=https://github.com/your-repo/tdbot
+After=network.target network-online.target
+Wants=network-online.target
+
+[Service]
+# 服务类型: simple 表示主进程启动后即视为服务已启动
+Type=simple
+
+# 运行用户和组（请根据实际情况修改）
+User=tdbot
+Group=tdbot
+
+# 工作目录（请根据实际部署路径修改）
+WorkingDirectory=/opt/tdbot
+
+# 启动命令
+ExecStart=/opt/tdbot/venv/bin/python -m bot.main
+
+# 停止命令（发送 SIGTERM 信号，优雅关闭）
+ExecStop=/bin/kill -SIGTERM $MAINPID
+
+# 重启策略
+Restart=always
+RestartSec=10
+
+# 最大重启频率限制（5分钟内最多重启5次）
+StartLimitIntervalSec=300
+StartLimitBurst=5
+
+# 环境变量
+Environment=PYTHONUNBUFFERED=1
+Environment=PYTHONDONTWRITEBYTECODE=1
+
+# 从文件加载环境变量（包含 BOT_TOKEN 等敏感配置）
+EnvironmentFile=/opt/tdbot/.env
+
+# 资源限制
+# 最大打开文件数
+LimitNOFILE=65535
+# 最大进程数
+LimitNPROC=4096
+
+# 安全加固
+# 禁止获取新的权限
+NoNewPrivileges=yes
+# 保护系统目录
+ProtectSystem=strict
+# 保护 home 目录
+ProtectHome=yes
+# 私有 /tmp 目录
+PrivateTmp=yes
+# 私有设备
+PrivateDevices=yes
+
+# 允许写入的目录（日志和数据库）
+ReadWritePaths=/opt/tdbot/bot.log /opt/tdbot/bot_data.db /opt/tdbot/config
+
+# 标准输出和错误重定向到日志
+StandardOutput=journal
+StandardError=journal
+
+# 日志标识符
+SyslogIdentifier=tdbot
+
+# 超时设置
+TimeoutStartSec=30
+TimeoutStopSec=30
+
+[Install]
+# 设置为多用户模式下自启动
+WantedBy=multi-user.target
+
