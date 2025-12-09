@@ -1,0 +1,56 @@
+# Render 部署配置文件
+# 文档: https://render.com/docs/blueprint-spec
+
+services:
+  # 土豆担保 Telegram Bot - Background Worker
+  - type: worker
+    name: tudou-bot
+    runtime: python
+    plan: starter  # $7/月，512MB 内存
+    region: singapore  # 新加坡节点，亚洲访问更快
+    
+    # 构建命令
+    buildCommand: |
+      pip install --upgrade pip
+      pip install -r requirements.txt
+    
+    # 启动命令
+    startCommand: python -m bot.main
+    
+    # 健康检查（Worker 类型不需要）
+    # healthCheckPath: /health
+    
+    # 环境变量
+    envVars:
+      # 必填项（需要在 Render Dashboard 手动设置值）
+      - key: BOT_TOKEN
+        sync: false
+      - key: PAYMENT_ADDRESS
+        sync: false
+      
+      # 推荐配置（需要在 Render Dashboard 手动设置值）
+      - key: ADMIN_USER_IDS
+        sync: false
+      
+      # 默认值（可在 Dashboard 覆盖）
+      - key: BOT_NAME
+        value: "土豆担保"
+      - key: LOG_LEVEL
+        value: "INFO"
+      - key: ENABLE_HUMAN_NOTIFICATION
+        value: "true"
+      - key: PAYMENT_NETWORK
+        value: "TRC20"
+      - key: USER_STATE_EXPIRE
+        value: "3600"
+      - key: DEBUG_MODE
+        value: "false"
+      
+      # Python 环境设置
+      - key: PYTHONUNBUFFERED
+        value: "1"
+
+    # 自动部署设置
+    autoDeploy: true  # 推送到 render-prod 分支时自动部署
+    branch: render-prod  # 生产部署专用分支
+

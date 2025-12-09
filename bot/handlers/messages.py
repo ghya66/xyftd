@@ -12,7 +12,7 @@ from ..keyboards.reply import get_main_menu_reply_keyboard, is_menu_button, get_
 from ..services.user_state import user_state_manager, UserState
 from ..services.group_verify import GroupVerifyService
 from ..services.human_agent import HumanAgentService
-from .service_responses import SERVICE_RESPONSES
+from .service_responses import get_service_response
 
 
 def replace_placeholders(text: str) -> str:
@@ -71,8 +71,8 @@ async def handle_menu_button(update: Update, context: ContextTypes.DEFAULT_TYPE,
 
     print(f"[MenuButton] 用户 {user.first_name} (ID: {user.id}) 点击了: {button_text} -> {service_code}")
 
-    # 获取服务响应内容
-    response_data = SERVICE_RESPONSES.get(service_code)
+    # 获取服务响应内容（使用动态加载，支持热加载）
+    response_data = get_service_response(service_code)
     if not response_data:
         await update.message.reply_text("服务暂不可用，请联系客服。")
         return
